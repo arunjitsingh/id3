@@ -18,7 +18,7 @@ _toNumber = (s, ebb) ->
       return s[3] | (s[2] << b) | (s[1] << (2 * b)) | (s[0] << (3 * b))
 
 
-## Frame parser
+#### Frame parser
 # Parses/decodes data in a frame.
 FrameParser = {}
 
@@ -58,19 +58,23 @@ FrameParser.get = (version) ->
 
 
 ## Parser
-# The base `Parser` class.
+# Parses data to extract ID3 information like headers, version, size, etc.
+#
+# `@version` determines the format of the frames. The `@frameParser`
+# (@see `FrameParser`) does the actual decoding of frame data.
 class Parser
 
   # Initializes the parser with the data that needs to be parsed.
   # > data: (Buffer) The data buffer.
   constructor: (@data) ->
+    # If the data doesn't start with `"ID3"`, it has no tags.
     if not @data.slice(0, 3).toString() == 'ID3'
-      return
+      throw new Error 'No ID3 tags present!'
 
-    # ID3v2.x version `x`.
+    # ID3v2.x version (the `x`).
     @version = @data[3] | (@data[4] << 8)
 
-    # Size of all frames (minus header).
+    # Size of all frames, padding and extended header (minus header, footer).
     @size = _toNumber @data.slice(6, 10), no
 
     @_initializeExtendedHeader()
@@ -86,7 +90,8 @@ class Parser
 
 
   # Parses the extended header. This is currently unimplemented and only updates
-  # `@next` to the index of the first frame.
+  # `@extendedHeaderSize` so that the index of the first frame can be
+  # determined.
   _initializeExtendedHeader: () ->
     # Whether this file has an extended header
     @hasExtendedHeader = (@data[5] & 0x40)
@@ -112,9 +117,12 @@ class Parser
     @frameParser = FrameParser.get @version
 
 
+  # Determines whether his file includes a footer. The footer has no
+  # information (is identical to the header, except that it starts with
+  # `"3DI"`).
   _initializeFooter: () ->
-    # Whether this file has a footer
     @hasFooter = (@data[5] & 0x10)
+
 
   # Returns the index of the first byte of the `frames`.
   _getFrameStart: () ->
@@ -132,34 +140,42 @@ class Parser
     szsz = @frameSizeSize
     flsz = @frameFlagsSize
     tags = @tags = {}
-    ids = @ids = []
+    ids = @ids = []  # debugging only
 
     i = @_getFrameStart()
     max = @totalSize - (if @hasFooter then 10 else 0)
 
     while i < max
+      # Get the frame ID.
       id = data.slice(i, i + idsz).toString()
       if not /^[A-Z0-9]+$/.test(id)
         break  # no longer parsing frames
       i += idsz
       ids.push id
 
+      # Attachments (v.4), and embedded images use 8-bit sizes. There will be
+      # a better way to determine this than a naive regex.
       sz = _toNumber data.slice(i, i + szsz), /A?PIC/.test(id)
       i += szsz
 
+      # Check if this ID is supported.
       if not parser[id]
         i += flsz + sz
         continue  # not a known tag
 
+      # Currently, frame flags are ignored.
       fl = data.slice(i, i + flsz)
       i += flsz
 
+      # The frame data.
       frame = data.slice(i, i + sz)
       i += sz
 
+      # Set the tag. `parser[id]` is a two-element array of `key` and `decoder
+      # function`.
       p = parser[id]
       tags[p[0]] = p[1](frame)
-    @parsed = ids.length > 0
+    @parsed = true
     @tags
 
 

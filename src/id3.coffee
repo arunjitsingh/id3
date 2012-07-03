@@ -14,10 +14,10 @@
 # The code for the parser is open sourced on
 # [Github](https://github.com/arunjitsingh) under the MIT license.
 
-require 'coffee-script'
-
 
 #### Module dependencies.
+require 'coffee-script'
+
 fs = require 'fs'
 path = require 'path'
 util = require 'util'
@@ -26,6 +26,9 @@ util = require 'util'
 log = require 'npmlog'
 # `nopt`: command line options parser.
 nopt = require 'nopt'
+
+# The parser.
+{Parser} = require './parser'
 
 
 # Options for the command line.

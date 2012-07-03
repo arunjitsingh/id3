@@ -7,9 +7,6 @@
     "lib": "./lib",
     "test": "./test"
   },
-  "scripts": {
-    "test": "mocha --compilers coffee:coffee-script -R spec"
-  },
   "author": "Arunjit Singh <arunjit@me.com>",
   "license": "MIT"
 }

@@ -1,16 +1,13 @@
-# Copyright 2012 Arunjit Singh. All Rights Reserved.
-# Author: Arunjit Singh <arunjit@me.com>
-# License: MIT. See LICENSE.
-#
 # Tests for the ID3 parser.
 
 require 'coffee-script'
 
 fs = require 'fs'
 {assert, expect, should} = require 'chai'
-{Parser} = require '../src/parser'
+{Parser} = require '../lib-cov/parser'
 
 
+#### ID3v2.2
 describe 'Short ID3v2.2 audio', ->
   parser = null
 
