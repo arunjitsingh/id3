@@ -8,6 +8,6 @@ test: id3
 	mocha --compilers coffee:coffee-script -R spec test/*.coffee
 
 coverage: id3 id3-test
-	mocha -R html-cov test/*.js > docs/coverage.html
+	ID3_COV=1 mocha -R html-cov test/*.js > coverage.html
 
 .PHONY: test

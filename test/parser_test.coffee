@@ -4,7 +4,10 @@ require 'coffee-script'
 
 fs = require 'fs'
 {assert, expect, should} = require 'chai'
-{Parser} = require '../lib-cov/parser'
+
+libpath = if process.env['ID3_COV'] then '../lib-cov' else '../src'
+
+{Parser} = require libpath + '/parser'
 
 
 #### ID3v2.2
