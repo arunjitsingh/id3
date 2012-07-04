@@ -1,0 +1,54 @@
+<!DOCTYPE html>  <html> <head>   <title>parser_test.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="id3.html">                 id3.coffee               </a>                                           <a class="source" href="parser.html">                 parser.coffee               </a>                                           <a class="source" href="parser_test.html">                 parser_test.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               parser_test.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <p>Tests for the ID3 parser.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">require</span> <span class="s1">&#39;coffee-script&#39;</span>
+
+<span class="nv">fs = </span><span class="nx">require</span> <span class="s1">&#39;fs&#39;</span>
+<span class="p">{</span><span class="nx">assert</span><span class="p">,</span> <span class="nx">expect</span><span class="p">,</span> <span class="nx">should</span><span class="p">}</span> <span class="o">=</span> <span class="nx">require</span> <span class="s1">&#39;chai&#39;</span>
+
+<span class="nv">libpath = </span><span class="k">if</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">[</span><span class="s1">&#39;ID3_COV&#39;</span><span class="p">]</span> <span class="k">then</span> <span class="s1">&#39;../lib-cov&#39;</span> <span class="k">else</span> <span class="s1">&#39;../src&#39;</span>
+
+<span class="p">{</span><span class="nx">Parser</span><span class="p">}</span> <span class="o">=</span> <span class="nx">require</span> <span class="nx">libpath</span> <span class="o">+</span> <span class="s1">&#39;/parser&#39;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <h3>ID3v2.2</h3>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">describe</span> <span class="s1">&#39;Short ID3v2.2 audio&#39;</span><span class="p">,</span> <span class="o">-&gt;</span>
+  <span class="nv">parser = </span><span class="kc">null</span>
+
+  <span class="nx">beforeEach</span> <span class="nf">(done) -&gt;</span>
+    <span class="nx">fs</span><span class="p">.</span><span class="nx">readFile</span> <span class="s1">&#39;test/mj_short.mp3&#39;</span><span class="p">,</span> <span class="nf">(err, data) -&gt;</span>
+      <span class="k">return</span> <span class="nx">done</span> <span class="nx">err</span> <span class="k">if</span> <span class="nx">err</span>
+      <span class="nv">parser = </span><span class="k">new</span> <span class="nx">Parser</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+      <span class="nx">parser</span><span class="p">.</span><span class="nx">parse</span><span class="p">()</span>
+      <span class="nx">done</span><span class="p">()</span>
+
+  <span class="nx">it</span> <span class="s1">&#39;is ID3v2.2&#39;</span><span class="p">,</span> <span class="nf">() -&gt;</span>
+    <span class="nx">expect</span><span class="p">(</span><span class="nx">parser</span><span class="p">.</span><span class="nx">version</span><span class="p">).</span><span class="nx">to</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="nx">expect</span><span class="p">(</span><span class="nx">parser</span><span class="p">.</span><span class="nx">frameIdSize</span><span class="p">).</span><span class="nx">to</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="nx">expect</span><span class="p">(</span><span class="nx">parser</span><span class="p">.</span><span class="nx">frameSizeSize</span><span class="p">).</span><span class="nx">to</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="nx">expect</span><span class="p">(</span><span class="nx">parser</span><span class="p">.</span><span class="nx">frameFlagsSize</span><span class="p">).</span><span class="nx">to</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+  <span class="nx">it</span> <span class="s1">&#39;has finished parsing&#39;</span><span class="p">,</span> <span class="nf">() -&gt;</span>
+    <span class="nx">expect</span><span class="p">(</span><span class="nx">parser</span><span class="p">.</span><span class="nx">parsed</span><span class="p">).</span><span class="nx">to</span><span class="p">.</span><span class="nx">be</span><span class="p">.</span><span class="kc">true</span><span class="p">;</span>
+
+  <span class="nx">it</span> <span class="s1">&#39;has some tags&#39;</span><span class="p">,</span> <span class="nf">() -&gt;</span>
+    <span class="nv">ids = </span><span class="nx">parser</span><span class="p">.</span><span class="nx">ids</span>
+    <span class="nv">tags = </span><span class="nx">parser</span><span class="p">.</span><span class="nx">tags</span>
+    <span class="nx">expect</span><span class="p">(</span><span class="nx">ids</span><span class="p">).</span><span class="nx">to</span><span class="p">.</span><span class="nx">include</span><span class="p">(</span><span class="s1">&#39;TAL&#39;</span><span class="p">)</span>
+    <span class="nx">expect</span><span class="p">(</span><span class="nx">ids</span><span class="p">).</span><span class="nx">to</span><span class="p">.</span><span class="nx">include</span><span class="p">(</span><span class="s1">&#39;TP1&#39;</span><span class="p">)</span>
+    <span class="nx">expect</span><span class="p">(</span><span class="nx">ids</span><span class="p">).</span><span class="nx">to</span><span class="p">.</span><span class="nx">include</span><span class="p">(</span><span class="s1">&#39;TT2&#39;</span><span class="p">)</span>
+    <span class="nx">expect</span><span class="p">(</span><span class="nx">tags</span><span class="p">).</span><span class="nx">to</span><span class="p">.</span><span class="nx">have</span><span class="p">.</span><span class="nx">property</span><span class="p">(</span><span class="s1">&#39;album&#39;</span><span class="p">)</span>
+    <span class="nx">expect</span><span class="p">(</span><span class="nx">tags</span><span class="p">).</span><span class="nx">to</span><span class="p">.</span><span class="nx">have</span><span class="p">.</span><span class="nx">property</span><span class="p">(</span><span class="s1">&#39;artist&#39;</span><span class="p">)</span>
+    <span class="nx">expect</span><span class="p">(</span><span class="nx">tags</span><span class="p">).</span><span class="nx">to</span><span class="p">.</span><span class="nx">have</span><span class="p">.</span><span class="nx">property</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">)</span>
+
+  <span class="nx">describe</span> <span class="s1">&#39;MJ\&#39;s &quot;Smile&quot; from &quot;HIStory...&quot; (1995)&#39;</span><span class="p">,</span> <span class="o">-&gt;</span>
+    <span class="nx">it</span> <span class="s1">&#39;is by Michael Jackson&#39;</span><span class="p">,</span> <span class="nf">() -&gt;</span>
+      <span class="nv">tags = </span><span class="nx">parser</span><span class="p">.</span><span class="nx">tags</span>
+      <span class="nx">expect</span><span class="p">(</span><span class="nx">tags</span><span class="p">[</span><span class="s1">&#39;artist&#39;</span><span class="p">]).</span><span class="nx">to</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="s1">&#39;Michael Jackson&#39;</span><span class="p">)</span>
+
+    <span class="nx">it</span> <span class="s1">&#39;is called &quot;Smile&quot;&#39;</span><span class="p">,</span> <span class="nf">() -&gt;</span>
+      <span class="nv">tags = </span><span class="nx">parser</span><span class="p">.</span><span class="nx">tags</span>
+      <span class="nx">expect</span><span class="p">(</span><span class="nx">tags</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]).</span><span class="nx">to</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="s1">&#39;Smile&#39;</span><span class="p">)</span>
+
+    <span class="nx">it</span> <span class="s1">&#39;is from &quot;HIStory Past, Present and Future, Book 1&quot;&#39;</span><span class="p">,</span> <span class="nf">() -&gt;</span>
+      <span class="nv">tags = </span><span class="nx">parser</span><span class="p">.</span><span class="nx">tags</span>
+      <span class="nx">expect</span><span class="p">(</span><span class="nx">tags</span><span class="p">[</span><span class="s1">&#39;album&#39;</span><span class="p">]).</span><span class="nx">to</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="s1">&#39;HIStory Past, Present and Future, Book 1&#39;</span><span class="p">)</span>
+
+    <span class="nx">it</span> <span class="s1">&#39;was recorded in 1995&#39;</span><span class="p">,</span> <span class="nf">() -&gt;</span>
+      <span class="nv">tags = </span><span class="nx">parser</span><span class="p">.</span><span class="nx">tags</span>
+      <span class="nx">expect</span><span class="p">(</span><span class="nx">tags</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">]).</span><span class="nx">to</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="s1">&#39;1995&#39;</span><span class="p">)</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
