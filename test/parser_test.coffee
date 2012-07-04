@@ -34,8 +34,25 @@ describe 'Short ID3v2.2 audio', ->
     ids = parser.ids
     tags = parser.tags
     expect(ids).to.include('TAL')
+    expect(ids).to.include('TP1')
+    expect(ids).to.include('TT2')
     expect(tags).to.have.property('album')
+    expect(tags).to.have.property('artist')
+    expect(tags).to.have.property('title')
 
-  it 'is "HIStory Past, Present and Future, Book 1"', () ->
-    tags = parser.tags
-    expect(tags['album']).to.equal('HIStory Past, Present and Future, Book 1')
+  describe 'MJ\'s "Smile" from "HIStory..." (1995)', ->
+    it 'is by Michael Jackson', () ->
+      tags = parser.tags
+      expect(tags['artist']).to.equal('Michael Jackson')
+
+    it 'is called "Smile"', () ->
+      tags = parser.tags
+      expect(tags['title']).to.equal('Smile')
+
+    it 'is from "HIStory Past, Present and Future, Book 1"', () ->
+      tags = parser.tags
+      expect(tags['album']).to.equal('HIStory Past, Present and Future, Book 1')
+
+    it 'was recorded in 1995', () ->
+      tags = parser.tags
+      expect(tags['year']).to.equal('1995')

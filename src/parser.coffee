@@ -34,17 +34,28 @@ FrameParser._decodeText = (data) ->
       headsz = tailsz = 1
     when 1, 2
       headsz = tailsz = 2
-  data.toString('utf-8', headsz, len - tailsz)
+  if data[len - tailsz] != 0
+    tailsz = 0
+  data.toString 'utf-8', headsz, len - tailsz
 
 
 # Decoders for v1,2.
 FrameParser._v1Decoders =
-  'TAL': ['album', FrameParser._decodeText]
+  'TAL': ['album',    FrameParser._decodeText],
+  'TP1': ['artist',   FrameParser._decodeText],
+  'TT2': ['title',    FrameParser._decodeText],
+  'TYE': ['year',     FrameParser._decodeText],
+  'TIM': ['time',     FrameParser._decodeText],
 
 
 # Decoders for v3,4.
 FrameParser._v3Decoders =
-  'TALB': ['album', FrameParser._decodeText]
+  'TALB': ['album',   FrameParser._decodeText],
+  'TPE1': ['artist',  FrameParser._decodeText],
+  'TIT2': ['title',   FrameParser._decodeText],
+  'TYER': ['year',    FrameParser._decodeText],
+  'TIME': ['time',    FrameParser._decodeText],
+
 
 
 # Returns a frame parser.
