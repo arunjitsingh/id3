@@ -33,12 +33,8 @@ describe 'Short ID3v2.2 audio', ->
   it 'has some tags', () ->
     ids = parser.ids
     tags = parser.tags
-    expect(ids).to.include('TAL')
-    expect(ids).to.include('TP1')
-    expect(ids).to.include('TT2')
-    expect(tags).to.have.property('album')
-    expect(tags).to.have.property('artist')
-    expect(tags).to.have.property('title')
+    expect(ids).to.contain('TAL', 'TP1', 'TT2')
+    expect(tags).to.contain.keys('album', 'artist', 'title')
 
   describe 'MJ\'s "Smile" from "HIStory..." (1995)', ->
     it 'is by Michael Jackson', () ->
